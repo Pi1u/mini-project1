@@ -20,10 +20,7 @@ void addToken(Token** head, Token** tail, TokenType type, char *value)
     }
 
     newToken -> type = type;
-
-    newToken->value = malloc(strlen(value) + 1);
-    strcpy(newToken->value, value);
-
+    newToken -> value = strdup(value);
     newToken -> next = NULL;
     
     if ((*head) == NULL) (*head) = newToken;
@@ -159,6 +156,7 @@ Token *tokenize(char* input)
         }
     }
 
+    //For whatever that is still left in the buffer
     if (buf_idx > 0)
     {
         buffer[buf_idx] = '\0';
