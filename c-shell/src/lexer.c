@@ -10,9 +10,43 @@ typedef enum
     STATE_IN_DQ  //Double Quotes
 } LexerState;
 
-void addToken(Token **head, Token **tail, TokenType type, char *value);
+void addToken(Token** head, Token** tail, TokenType type, char *value)
+{
+    Token* newToken = malloc(sizeof(Token));
+    if (newToken == NULL)
+    {
+        perror("Failed to allocate token");
+        exit(1);
+    }
 
-Token *tokenize(char *input)
+    newToken -> type = type;
+
+    newToken->value = malloc(strlen(value) + 1);
+    strcpy(newToken->value, value);
+
+    newToken -> next = NULL;
+    
+    if ((*head) == NULL) (*head) = newToken;
+    else (*tail) -> next = newToken;
+
+    (*tail) = newToken;
+}
+
+void freeTokens(Token* head)
+{
+    Token* current = head;
+    Token* temp;
+
+    while (current != NULL)
+    {
+        temp = current -> next;
+        free(current -> value);
+        free(current);
+        current = temp;
+    }
+}
+
+Token *tokenize(char* input)
 {
     Token *head = NULL;
     Token *tail = NULL;
@@ -136,7 +170,7 @@ Token *tokenize(char *input)
     if (state != STATE_NORMAL)
     {
         printf("c-shell: invalid syntax\n");
-        //Free any tokens allocated so far to prevent memory leaks
+        freeTokens(head);
         return NULL;
     }
     return head;

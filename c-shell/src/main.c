@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "prompt.h"
+#include "lexer.h"
 
 int main(void) {
     char input[1024];
@@ -14,13 +15,17 @@ int main(void) {
             printf("\n");
             break;
         }
+
         input[strcspn(input, "\n")] = '\0';
+        Token* head = tokenize(input);
+        Token* temp = head;
 
-        if (strlen(input) > 0) {
-            printf("You typed: '%s'\n", input);
+        while (temp != NULL)
+        {
+            printf("Token Type: %d | Token Value: [%s]\n", temp->type, temp->value);
+            temp = temp -> next;
         }
-        
-
+        freeTokens(head);
     }
     return 0;
 }

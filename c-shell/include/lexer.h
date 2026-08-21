@@ -18,4 +18,11 @@ typedef struct Token {
     struct Token *next;
 } Token;
 
+void freeTokens(Token* head)
+{
+
+}
+
+Token* tokenize(char* input);
+
 #endif
