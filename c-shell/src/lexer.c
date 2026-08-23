@@ -115,6 +115,16 @@ Token *tokenize(char* input)
                 }
                 addToken(&head, &tail, TOKEN_LT, "<");
             }
+            else if (c == ';')
+            {
+                if (buf_idx > 0)
+                {
+                    buffer[buf_idx] = '\0';
+                    addToken(&head, &tail, TOKEN_WORD, buffer);
+                    buf_idx = 0;
+                }
+                addToken(&head, &tail, TOKEN_SEMI, ";");
+            }
             else if (c == '>')
             {
                 if (buf_idx > 0)
