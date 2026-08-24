@@ -4,6 +4,8 @@
 #include <time.h>
 #include "parser.h"
 
+extern char prevDirectory[4096];
+
 typedef struct {
     char path[4096];
     int frequency;
