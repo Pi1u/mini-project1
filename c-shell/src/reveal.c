@@ -162,7 +162,7 @@ void executeReveal(Command* command)
             if (count >= capacity)
             {
                 capacity *= 2;
-                char** temp = realloc(entries, capacity * sizeof(char*));
+                char** temp = realloc(entries, sizeof(char*) * capacity);
                 if (temp == NULL)
                 {
                     perror("reveal: realloc failed");

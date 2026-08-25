@@ -82,10 +82,6 @@ void executeHop(Command* command)
     }
 }
 
-void executePeek(Command* command) {
-    printf("Peek command not yet implemented.\n");
-}
-
 void executeLocate(Command* command) {
     printf("Locate command not yet implemented.\n");
 }
