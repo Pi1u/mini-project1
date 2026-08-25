@@ -59,9 +59,28 @@ void revealRecursive(const char* basePath, const char* prefix, int aFlag)
         struct stat pathStat;
         char fullPath[4096];
         sprintf(fullPath, "%s/%s", basePath, entries[i]);
-        //continue from here
+        
+        if (stat(fullPath, &pathStat) == 0)
+        {
+            if (S_ISDIR(pathStat.st_mode))
+            {
+                if (strcmp(entries[i], ".") != 0 && strcmp(entries[i], "..") != 0)
+                {
+                    printf("%s%s/\n", prefix, entries[i]);
+                    char newPrefix[4096];
+                    sprintf(newPrefix, "%s%s/", prefix, entries[i]);
+                    revealRecursive(fullPath, newPrefix, aFlag);
+                }
+            }
+            else
+            {
+                // Print regular file
+                printf("%s%s\n", prefix, entries[i]);
+            }
+        }
+        free(entries[i]);
     }
-    
+    free(entries);
 }
 
 void executeReveal(Command* command)
@@ -114,52 +133,55 @@ void executeReveal(Command* command)
         }
     }
 
-    DIR* dir = opendir(target);
-    if (dir == NULL)
+    if (tFlag == 1) revealRecursive(target, "", aFlag);
+    else
     {
-        printf("reveal: no such directory\n");
-        return;
-    }
-
-    int capacity = 1024;
-    int count = 0;
-
-    char** entries = malloc(sizeof(char*) * capacity); 
-    if (entries == NULL)
-    {
-        perror("reveal: malloc failed");
-        closedir(dir);
-        return;
-    }
-
-    struct dirent* entry;
-    while ((entry = readdir(dir)) != NULL)
-    {
-        if (!aFlag && entry -> d_name[0] == '.') continue;
-        else entries[count++] = strdup(entry -> d_name);
-        if (count >= capacity)
+        DIR* dir = opendir(target);
+        if (dir == NULL)
         {
-            capacity *= 2;
-            char** temp = realloc(entries, capacity * sizeof(char*));
-            if (temp == NULL)
-            {
-                perror("reveal: realloc failed");
-                for (int i = 0; i < count; i++) free(entries[i]);
-                free(entries);
-                closedir(dir);
-                return;
-            }
-            entries = temp;
+            printf("reveal: no such directory\n");
+            return;
         }
-    }
-    closedir(dir);
-    qsort(entries, count, sizeof(char*), compare_pointers);
 
-    for (int i = 0; i < count; i++)
-    {
-        printf("%s\n", entries[i]);
-        free(entries[i]);
-    }
-    free(entries);
+        int capacity = 1024;
+        int count = 0;
 
+        char** entries = malloc(sizeof(char*) * capacity); 
+        if (entries == NULL)
+        {
+            perror("reveal: malloc failed");
+            closedir(dir);
+            return;
+        }
+
+        struct dirent* entry;
+        while ((entry = readdir(dir)) != NULL)
+        {
+            if (!aFlag && entry -> d_name[0] == '.') continue;
+            else entries[count++] = strdup(entry -> d_name);
+            if (count >= capacity)
+            {
+                capacity *= 2;
+                char** temp = realloc(entries, capacity * sizeof(char*));
+                if (temp == NULL)
+                {
+                    perror("reveal: realloc failed");
+                    for (int i = 0; i < count; i++) free(entries[i]);
+                    free(entries);
+                    closedir(dir);
+                    return;
+                }
+                entries = temp;
+            }
+        }
+        closedir(dir);
+        qsort(entries, count, sizeof(char*), compare_pointers);
+
+        for (int i = 0; i < count; i++)
+        {
+            printf("%s\n", entries[i]);
+            free(entries[i]);
+        }
+        free(entries);
+    }
 }
